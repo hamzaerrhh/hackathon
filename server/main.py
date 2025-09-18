@@ -4,7 +4,6 @@ from pymongo import MongoClient
 import os
 from routes.ml import ml_bp
 
-
 from dotenv import load_dotenv
 import google.generativeai as genai
 from helper.tool import (
@@ -61,14 +60,18 @@ tools = genai.protos.Tool(
             name="predict_salary",
             description="Predicts the salary for a given data.",
             parameters=genai.protos.Schema(
-                type=genai.protos.Type.OBJECT,
-                properties={
-                    "role": genai.protos.Schema(type=genai.protos.Type.STRING),
-                    "years_experience": genai.protos.Schema(type=genai.protos.Type.NUMBER)
-                },
-                required=["role", "years_experience"]
-            )
-        ),
+            type=genai.protos.Type.OBJECT,
+            properties={
+              "role": genai.protos.Schema(type=genai.protos.Type.STRING),
+              "years_experience": genai.protos.Schema(type=genai.protos.Type.NUMBER),
+               "degree": genai.protos.Schema(type=genai.protos.Type.STRING),
+               "company_size": genai.protos.Schema(type=genai.protos.Type.STRING),
+               "location": genai.protos.Schema(type=genai.protos.Type.STRING),
+               "level": genai.protos.Schema(type=genai.protos.Type.STRING)
+        },
+        # required=["role", "years_experience", "degree", "company_size", "location", "level"]
+    )
+),
         genai.protos.FunctionDeclaration(
             name="check_job_fit",
             description="Checks a candidate's fit for a job based on their IDs.",
@@ -148,7 +151,6 @@ def get_mongodb_connection():
 
 # Initialize MongoDB connection
 db = get_mongodb_connection()
-# mongo = PyMongo(app)
 
 
 #chat route
@@ -164,16 +166,15 @@ def handle_chat_request():
     chat = model.start_chat()
 
     try:
-        # First turn: Send the user prompt to the model
         response = chat.send_message(user_prompt)
+        first_part = response.candidates[0].content.parts[0]
 
-        # Check if the model has a function call
-        if response.candidates[0].content.parts[0].function_call:
-            function_call = response.candidates[0].content.parts[0].function_call
+        if getattr(first_part, "function_call", None):
+            # It's a function call, not plain text
+            function_call = first_part.function_call
             function_name = function_call.name
-            function_args = {key: value for key, value in function_call.args.items()}
+            function_args = function_call.args or {}
 
-            # Execute the correct Python function based on the name from the model
             tool_functions = {
                 "get_candidate": get_candidate,
                 "get_job": get_job,
@@ -184,16 +185,16 @@ def handle_chat_request():
                 "list_candidates": list_candidates,
                 "list_jobs": list_jobs
             }
-            
-            if function_name in tool_functions:
-                result = tool_functions[function_name](**function_args)
-            else:
+
+            if function_name not in tool_functions:
                 return jsonify({"error": "Unknown tool"}), 500
 
-            # Second turn: Send the function's result back to the model
+            result = tool_functions[function_name](**function_args)
+
+            # Send function result back to model
             final_response = chat.send_message(
                 genai.protos.Content(
-                    role='function',
+                    role="function",
                     parts=[genai.protos.Part(
                         function_response=genai.protos.FunctionResponse(
                             name=function_name,
@@ -202,10 +203,11 @@ def handle_chat_request():
                     )]
                 )
             )
-            return jsonify({"response": final_response.text+ "this is the response from the tool"})
+            return jsonify({"response": final_response.text + " (response from tool)"})
 
-        # If no tool is selected, return the direct model response
-        return jsonify({"response": response.text})
+        else:
+            # It's plain text
+            return jsonify({"response": first_part.text})
 
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -222,7 +224,6 @@ def chat_health():
     })
 
 #call route
-
 
 register_candidate_routes(app, db)
 job_controller.register_job_routes(app, db)

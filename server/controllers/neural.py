@@ -7,6 +7,7 @@ from sentence_transformers import SentenceTransformer
 # ----------------------------
 # ⿡ Device setup
 # ----------------------------
+
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print("Using device:", device)
 

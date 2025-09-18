@@ -1,25 +1,27 @@
 import requests
 from bson.json_util import dumps
 from models import Candidate, Job
+from controllers.salary_predet import predict
+
+
+
+modalPath="../models/random_forest.pkl"
+
+
 
 # Fetch a single candidate
 def get_candidate(candidate_id: str):
 
     try:
-        candidate = Candidate.objects(candidate_id=candidate_id).first()
-        if not candidate:
-            return None
-        
-        candidate_data = candidate.to_mongo()
         # Call external API
         try:
             api_response = requests.get(f"http://localhost:5000/api/candidate/{candidate_id}")
             if api_response.status_code == 200:
-                candidate_data["external_info"] = api_response.json()
+               return  api_response.json()
         except Exception as api_err:
-            candidate_data["external_info_error"] = str(api_err)
+            return "erro"
 
-        return dumps(candidate_data)
+        return api_response.json()
 
     except Exception as e:
         return {"error": f"Failed to retrieve candidate: {str(e)}"}
@@ -28,24 +30,18 @@ def get_candidate(candidate_id: str):
 # Fetch a single job
 def get_job(job_id: str):
     try:
-        job = Job.objects(id=job_id).first()
-        if not job:
-            return None
-        
-        job_data = job.to_mongo()
-
         # Call external API
-        try:
-            api_response = requests.get(f"http://localhost:5000/api/jobs/{job_id}")
-            if api_response.status_code == 200:
-                job_data["external_info"] = api_response.json()
-        except Exception as api_err:
-            job_data["external_info_error"] = str(api_err)
-
-        return dumps(job_data)
-
-    except Exception as e:
-        return {"error": f"Failed to retrieve job: {str(e)}"}
+        api_response = requests.get(f"http://localhost:5000/api/job/{job_id}")
+        if api_response.status_code == 200:
+            try:
+                return api_response.json()
+            except ValueError:
+                return {"error": "Invalid JSON from job API"}
+        if api_response.status_code == 404:
+            return {"error": "Job not found", "status": 404}
+        return {"error": "Job API error", "status": api_response.status_code, "text": api_response.text}
+    except Exception as api_err:
+        return {"error": f"Failed to retrieve job: {str(api_err)}"}
 
 
 # List all candidates
@@ -70,7 +66,7 @@ def list_candidates():
 # List all jobs
 def list_jobs():
     try:
-    
+
         try:
             api_response = requests.get("http://localhost:5000/api/jobs")
             if api_response.status_code == 200:
@@ -93,15 +89,71 @@ def check_job_fit(candidate_id: str, job_id: str):
     # Example: score = my_ml_model.predict_fit(candidate_data, job_data)
     return f"Candidate {candidate_id} is a good fit for job {job_id} with an 85% score."
 
-def predict_salary(role: str, years_experience: float):
-    print('now predect salary')
+def predict_salary(data: dict):
     """
     Predicts the salary for a given role and years of experience.
+
+    Args:
+        data (dict): Example format:
+            {
+                "years_exp_band": 5,
+                "english_level": 0,
+                "referral_flag": 1,
+                "location_match": "Location match local",
+                "skills_coverage_band": 0,
+            }
+
+    Returns:
+        str: predicted salary like "$85,000.00"
+        or dict: {"error": "..."} if inputs are invalid
     """
-    # Placeholder for a salary prediction ML model.
-    base_salary = 70000
-    predicted_salary = base_salary + (years_experience * 5000)
-    return f"${predicted_salary:,.2f}"
+    try:
+        # Validate required keys
+        required = [
+            "years_exp_band",
+            "english_level",
+            "referral_flag",
+            "location_match",
+            "skills_coverage_band",
+        ]
+        for key in required:
+            if key not in data:
+                return {"error": f"Missing required field: {key}"}
+
+        # Run prediction using your predictor
+        prediction = predict(modalPath,data)
+
+        # Format salary (if it's numeric)
+        if isinstance(prediction, (int, float)):
+            return f"${prediction:,.2f}"
+        return str(prediction)
+
+    except Exception as exc:
+        return {"error": str(exc)}
+
+
+
+
+def predict_salary_tool(data: dict):
+    """
+    Tool-friendly wrapper for predicting salary. Expects a dict input like:
+      {"role": "Data Scientist", "years_experience": 3}
+
+    Returns a dict with either {"prediction": "$85,000.00"}
+    or {"error": ..., "hint": ..., "usage": ...} when invalid.
+    """
+    role = None
+    years_experience = None
+
+    if isinstance(data, dict):
+        role = data.get("role")
+        years_experience = data.get("years_experience")
+
+    result = predict_salary(role, years_experience)
+    if isinstance(result, dict) and result.get("error"):
+        return result
+
+    return {"prediction": result}
 
 def screen_resume(candidate_id: str):
     """

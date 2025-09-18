@@ -2,6 +2,7 @@ from flask import Flask, jsonify,request
 from flask_cors import CORS
 from pymongo import MongoClient
 import os
+from routes.ml import ml_bp
 
 
 from dotenv import load_dotenv
@@ -58,7 +59,7 @@ tools = genai.protos.Tool(
         ),
         genai.protos.FunctionDeclaration(
             name="predict_salary",
-            description="Predicts the salary for a given role and years of experience.",
+            description="Predicts the salary for a given data.",
             parameters=genai.protos.Schema(
                 type=genai.protos.Type.OBJECT,
                 properties={
@@ -225,6 +226,12 @@ def chat_health():
 
 register_candidate_routes(app, db)
 job_controller.register_job_routes(app, db)
+
+
+
+#ml route
+app.register_blueprint(ml_bp, url_prefix="/api")
+
 
 # Home route
 @app.route('/')

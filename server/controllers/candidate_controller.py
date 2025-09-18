@@ -22,6 +22,7 @@ def register_candidate_routes(app, db):
     # GET: Retrieve a single candidate by candidate_id
     @app.route('/api/candidate/<candidate_id>', methods=['GET'])
     def get_candidate(candidate_id):
+        print('get condidate')
         candidate = candidates_collection.find_one({"candidate_id": candidate_id})
         if candidate:
             return dumps(candidate)

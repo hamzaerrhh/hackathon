@@ -24,6 +24,7 @@ A modern AI-powered chat application for HR (Human Resources) assistance, built 
 - Google Gemini AI
 - MongoDB Atlas
 - CORS enabled
+- ML library (pandas,pycle....)
 
 ## Setup Instructions
 
@@ -101,6 +102,12 @@ Dataset-genAI/
 ├── server/                 # Flask backend
 │   ├── main.py            # Main server file
 │   ├── requirements.txt   # Python dependencies
+│   ├── medels.py         # modules of mongodb
+│   ├── medels/          # folder have ai models
+│   ├── data/            # data used to train the modelss
+│   ├── helper         # helpers function
+│   ├── contrllers/   # function for the api requests
+│   ├── routes/      # routes folder for api endpointd 
 │   └── setup.py          # Setup script
 └── README.md
 ```
@@ -118,10 +125,15 @@ Dataset-genAI/
 - Google Gemini AI for intelligent responses
 - Error handling with fallback messages
 - Contextual HR-focused responses
+- 
+- ### ML models
+- Ml prdedict salary (Linear Regrition algho)
+- ML predect the condadt job fit (Logistique Rogristion)
+- ML predect priority of client (Random Forest Classifier)
+- ML Resume Screening Model ( Deep Learning (Neural Network) with TF-IDF) 
 
 ### UI/UX
 - Modern glassmorphism design
-- Smooth animations and transitions
 - Responsive layout
 - Dark theme with gradient accents
 - Mobile-friendly interface

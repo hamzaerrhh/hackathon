@@ -4,6 +4,9 @@ A modern AI-powered chat application for HR (Human Resources) assistance, built 
 
 ## Features
 
+
+<img src="https://screendy-cdn.fra1.cdn.digitaloceanspaces.com/platfrom-v2/_files/file_1758053485392_diagram.png" alt width="704" height="713" class="rounded-lg shadow border-[1px] border-gray-200" draggable="false" style="display: block;">
+
 - 🤖 **AI-Powered Chat**: Integrated with Google Gemini AI for intelligent responses
 - 💬 **Real-time Messaging**: Smooth chat interface with typing indicators
 - 📱 **Responsive Design**: Works on desktop and mobile devices

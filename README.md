@@ -4,7 +4,6 @@ A modern AI-powered chat application for HR (Human Resources) assistance, built 
 
 ## Features
 
-
 <img src="https://screendy-cdn.fra1.cdn.digitaloceanspaces.com/platfrom-v2/_files/file_1758053485392_diagram.png" alt width="704" height="713" class="rounded-lg shadow border-[1px] border-gray-200" draggable="false" style="display: block;">
 
 - 🤖 **AI-Powered Chat**: Integrated with Google Gemini AI for intelligent responses
@@ -17,12 +16,14 @@ A modern AI-powered chat application for HR (Human Resources) assistance, built 
 ## Tech Stack
 
 ### Frontend
+
 - React 18
 - Axios for API calls
 - Custom CSS with animations
 - Responsive design
 
 ### Backend
+
 - Flask (Python)
 - Google Gemini AI
 - MongoDB Atlas
@@ -34,21 +35,26 @@ A modern AI-powered chat application for HR (Human Resources) assistance, built 
 ### 1. Backend Setup
 
 1. Navigate to the server directory:
+
    ```bash
    cd server
    ```
 
 2. Install dependencies:
+
    ```bash
    python setup.py
    ```
+
    Or manually:
+
    ```bash
    pip install -r requirements.txt
    ```
 
 3. Configure environment variables:
    - Edit the `.env` file with your API keys:
+
    ```env
    gemini_ai_key=your_gemini_api_key_here
    user_pass=your_mongodb_username
@@ -64,11 +70,13 @@ A modern AI-powered chat application for HR (Human Resources) assistance, built 
 ### 2. Frontend Setup
 
 1. Navigate to the client directory:
+
    ```bash
    cd client
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
@@ -96,28 +104,46 @@ A modern AI-powered chat application for HR (Human Resources) assistance, built 
 
 ```
 Dataset-genAI/
-├── client/                 # React frontend
+│
+├── client/                         # React Frontend
 │   ├── src/
-│   │   ├── components/     # Reusable components
-│   │   ├── pages/         # Page components
-│   │   └── index.css      # Global styles
-│   └── package.json
-├── server/                 # Flask backend
-│   ├── main.py            # Main server file
-│   ├── requirements.txt   # Python dependencies
-│   ├── medels.py         # modules of mongodb
-│   ├── medels/          # folder have ai models
-│   ├── data/            # data used to train the modelss
-│   ├── helper         # helpers function
-│   ├── contrllers/   # function for the api requests
-│   ├── routes/      # routes folder for api endpointd 
-│   └── setup.py          # Setup script
-└── README.md
+│   │   ├── components/             # Reusable UI components
+│   │   ├── pages/                  # Application pages
+│   │   └── assets/                 # Static assets (images, styles, etc.)
+│   └── package.json                # Frontend dependencies
+│
+├── server/                         # Flask Backend
+│   ├── main.py                     # Application entry point
+│   ├── models.py                   # Database models schema
+│   │
+│   ├── models/                     # Trained AI/ML models
+│   │   ├── *.pkl                   # Serialized ML models
+│   │   └── *.pt                    # PyTorch models
+│   │
+│   ├── routes/                     # API route definitions
+│   ├── controllers/                # Business logic layer
+│   │   ├── candidate_controller.py
+│   │   ├── candidate_priority.py
+│   │   ├── job_controller.py
+│   │   ├── neural.py
+│   │   ├── priority_candidate.py
+│   │   ├── resume_controller.py
+│   │   ├── salary_predict.py
+│   │   └── salary_prediction_model.pkl
+│   │
+│   ├── helper/                     # Utility/helper functions
+│   │
+│   └── data/                       # Training datasets
+│       └── deepLearning/
+│           └── resume_screen.csv   # Resume screening dataset
+│
+└── README.md                       # Project documentation
 ```
 
 ## Features in Detail
 
 ### Chat Interface
+
 - Real-time message exchange
 - Typing indicators
 - Message timestamps
@@ -125,17 +151,19 @@ Dataset-genAI/
 - Keyboard shortcuts (Enter to send)
 
 ### AI Integration
+
 - Google Gemini AI for intelligent responses
 - Error handling with fallback messages
 - Contextual HR-focused responses
-- 
+-
 - ### ML models
 - Ml prdedict salary (Linear Regrition algho)
 - ML predect the condadt job fit (Logistique Rogristion)
 - ML predect priority of client (Random Forest Classifier)
-- ML Resume Screening Model ( Deep Learning (Neural Network) with TF-IDF) 
+- ML Resume Screening Model ( Deep Learning (Neural Network) with TF-IDF)
 
 ### UI/UX
+
 - Modern glassmorphism design
 - Responsive layout
 - Dark theme with gradient accents
@@ -153,6 +181,7 @@ Dataset-genAI/
 ### Getting Help
 
 If you encounter any issues:
+
 1. Check the console for error messages
 2. Verify that both servers are running
 3. Ensure all environment variables are set correctly
